@@ -2,6 +2,8 @@ package com.pingr.Connections.application;
 
 import com.pingr.Connections.core.Account;
 import com.pingr.Connections.core.events.AccountCreatedEvent;
+import com.pingr.Connections.core.events.AccountRemovedEvent;
+import com.pingr.Connections.core.events.AccountUpdatedEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,8 +85,50 @@ public class KafkaConsumerConfig {
         return factory;
     }
 
+    public ConsumerFactory<String, AccountUpdatedEvent> accountUpdatedEventConsumerFactory() {
+        JsonDeserializer<AccountUpdatedEvent> jsonDeserializer = new JsonDeserializer<>(AccountUpdatedEvent.class);
+        jsonDeserializer.setUseTypeMapperForKey(true);
+        jsonDeserializer.addTrustedPackages("*");   // com.pingr.Accounts.Accounts.Account.java
+        // com.pingr.Connection.core.Account.java
+
+        return new DefaultKafkaConsumerFactory<>(
+                consumerConfig(),
+                new StringDeserializer(),
+                jsonDeserializer
+        );
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, AccountUpdatedEvent>> accountUpdatedEventKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, AccountUpdatedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(accountUpdatedEventConsumerFactory());
+
+        return factory;
+    }
+
 
     // ==========================
+
+    public ConsumerFactory<String, AccountRemovedEvent> accountRemovedEventConsumerFactory() {
+        JsonDeserializer<AccountRemovedEvent> jsonDeserializer = new JsonDeserializer<>(AccountRemovedEvent.class);
+        jsonDeserializer.setUseTypeMapperForKey(true);
+        jsonDeserializer.addTrustedPackages("*");   // com.pingr.Accounts.Accounts.Account.java
+        // com.pingr.Connection.core.Account.java
+
+        return new DefaultKafkaConsumerFactory<>(
+                consumerConfig(),
+                new StringDeserializer(),
+                jsonDeserializer
+        );
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, AccountRemovedEvent>> accountRemovedEventKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, AccountRemovedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(accountRemovedEventConsumerFactory());
+
+        return factory;
+    }
 
 
 }
