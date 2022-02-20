@@ -1,12 +1,15 @@
 package com.pingr.Connections.core;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table
 public class Account {
     @Id
     private Long id;
+
+    private Set<Integer> friendships;
 
     public Account() {
     }
@@ -28,5 +31,13 @@ public class Account {
         return "Account{" +
                 "id=" + id +
                 '}';
+    }
+
+    public Set<Integer> getFriendships() {
+        return friendships;
+    }
+
+    public void setFriendships(Set<Integer> friendships) {
+        this.friendships = friendships;
     }
 }
